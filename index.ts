@@ -1,9 +1,12 @@
 #!/usr/bin/env node
+import * as path from 'path'
 
 import minimist from 'minimist'
 import prompts from 'prompts'
-import * as banners from './utils/banners'
+import banners from './utils/banners'
+import renderTemplate from './utils/render-template'
 
+console.log(banners);
 let result = {
   name: 'react-project',
 }
@@ -25,6 +28,8 @@ async function init() {
     // all arguments are treated as booleans
     boolean: true
   })
+  let targetDir = argv._[0]
+
   result = await prompts(
     [
       {
@@ -35,6 +40,21 @@ async function init() {
       },
     ]
   )
+
+  const root = path.join(cwd, targetDir)
+
+  // todo:
+  // work around the esbuild issue that `import.meta.url` cannot be correctly transpiled
+  // when bundling for node and the format is cjs
+  // const templateRoot = new URL('./template', import.meta.url).pathname
+  const templateRoot = path.resolve(__dirname, 'template')
+  const render = function render(templateName) {
+    const templateDir = path.resolve(templateRoot, templateName)
+    renderTemplate(templateDir, root)
+  }
+
+  // Render base template
+  render('base')
 }
 
 try {
