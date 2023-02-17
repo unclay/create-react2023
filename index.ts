@@ -20,9 +20,6 @@ async function init() {
   // possible options:
   const argv = minimist(process.argv.slice(2), {
     alias: {
-      typescript: ['ts'],
-      'with-tests': ['tests'],
-      router: ['vue-router']
     },
     string: ['_'],
     // all arguments are treated as booleans
