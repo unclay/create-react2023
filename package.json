@@ -1,0 +1,39 @@
+{
+  "name": "create-react2023",
+  "version": "1.0.0",
+  "description": "An easy way to start a React project",
+  "type": "module",
+  "engines": {
+    "node": "^14.18.0 || >=16.0.0"
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "format": "prettier --write .",
+    "build": "zx ./scripts/build.mjs",
+    "pretest": "npm run build",
+    "test": "zx ./scripts/test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unclay/create-react2023.git"
+  },
+  "author": "Clay <wcl58981298@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/unclay/create-react2023/issues"
+  },
+  "homepage": "https://github.com/unclay/create-react2023#readme",
+  "devDependencies": {
+    "esbuild": "^0.17.10",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.2",
+    "prettier": "^2.8.4",
+    "prompts": "^2.4.2",
+    "zx": "^7.2.0"
+  },
+  "lint-staged": {
+    "*.{js,mjs,json}": [
+      "prettier --write"
+    ]
+  }
+}
