@@ -22,6 +22,7 @@ async function init() {
 
   const cwd = process.cwd();
   // possible options:
+  // --force (for force overwriting)
   const argv = minimist(process.argv.slice(2), {
     alias: {},
     string: ["_"],
@@ -29,7 +30,9 @@ async function init() {
     boolean: true,
   });
   let targetDir = argv._[0];
-  const defaultProjectName = !targetDir ? "react-project" : targetDir;
+  const defaultProjectName = !targetDir ? "react-project" : targetDir
+
+  const forceOverwrite = argv.force
 
   result = await prompts([
     {
@@ -39,6 +42,16 @@ async function init() {
       initial: defaultProjectName,
       onState: (state) =>
         (targetDir = String(state.value).trim() || defaultProjectName),
+    },
+    {
+      name: 'shouldOverwrite',
+      type: () => (canSkipEmptying(targetDir) || forceOverwrite ? null : 'confirm'),
+      message: () => {
+        const dirForPrompt =
+          targetDir === '.' ? 'Current directory' : `Target directory "${targetDir}"`
+
+        return `${dirForPrompt} is not empty. Remove existing files and continue?`
+      }
     },
   ]);
 
@@ -62,4 +75,20 @@ try {
   init();
 } catch (err) {
   console.error(err);
+}
+
+function canSkipEmptying(dir: string) {
+  if (!fs.existsSync(dir)) {
+    return true
+  }
+
+  const files = fs.readdirSync(dir)
+  if (files.length === 0) {
+    return true
+  }
+  if (files.length === 1 && files[0] === '.git') {
+    return true
+  }
+
+  return false
 }
