@@ -1,18 +1,17 @@
-const path = require('path');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require("path");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 const webpackConfig = {
-  mode: 'none',
+  mode: "none",
   module: {
-    rules: [
-    ],
+    rules: [],
   },
   plugins: [
     // build html
     new HtmlWebpackPlugin({
-      template: './src/index.html',
-      filename: 'index.html',
-      inject: 'body',
+      template: "./src/index.html",
+      filename: "index.html",
+      inject: "body",
     }),
   ],
 };
@@ -20,28 +19,26 @@ const webpackConfig = {
 /**
  * build production
  */
-if (process.env.NODE_ENV === 'production') {
+if (process.env.NODE_ENV === "production") {
   Object.assign(webpackConfig, {
-    mode: 'production',
+    mode: "production",
     output: {
-      path: path.resolve(__dirname, '../dist'),
-      filename: '[name].js?[chunkhash]',
-      chunkFilename: '[id].js?[chunkhash]',
+      path: path.resolve(__dirname, "../dist"),
+      filename: "[name].js?[chunkhash]",
+      chunkFilename: "[id].js?[chunkhash]",
     },
-    plugins: [
-      ...webpackConfig.plugins,
-    ],
+    plugins: [...webpackConfig.plugins],
   });
 }
 
 /**
  * build devlopment
  */
-if (process.env.NODE_ENV === 'development') {
+if (process.env.NODE_ENV === "development") {
   Object.assign(webpackConfig, {
-    mode: 'development',
+    mode: "development",
     devServer: {
-      allowedHosts: 'all',
+      allowedHosts: "all",
       client: {
         // wss + domain
         // webSocketURL: 'wss://domain/pathname/ws',
@@ -49,9 +46,7 @@ if (process.env.NODE_ENV === 'development') {
         // webSocketURL: `ws://${'0.0.0.0'}:8080/ws`,
       },
     },
-    plugins: [
-      ...webpackConfig.plugins,
-    ],
+    plugins: [...webpackConfig.plugins],
   });
 }
 

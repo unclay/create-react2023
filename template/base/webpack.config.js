@@ -1,19 +1,19 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
-  mode: 'development',
+  mode: "development",
   entry: {
-    main: './src/index.js'
+    main: "./src/index.js",
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: './src/index.html',
-      filename: 'index.html',
-      inject: 'body',
+      template: "./src/index.html",
+      filename: "index.html",
+      inject: "body",
     }),
   ],
   devServer: {
-    allowedHosts: 'all',
+    allowedHosts: "all",
     client: {
       // wss + domain
       // webSocketURL: 'wss://domain/pathname/ws',
