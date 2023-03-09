@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "@teamsupercell/typings-for-css-modules-loader": "2.5.2"
+  }
+}

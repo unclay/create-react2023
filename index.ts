@@ -7,10 +7,15 @@ import minimist from "minimist";
 import prompts from "prompts";
 import banners from "./utils/banners";
 import renderTemplate from "./utils/render-template";
+import {
+  postOrderDirectoryTraverse,
+  preOrderDirectoryTraverse,
+} from "./utils/directory-traverse";
 
-let result = {
-  name: "react-project",
-};
+let result: {
+  projectName?: string;
+  shouldOverwrite?: boolean;
+} = {};
 async function init() {
   console.log();
   console.log(
@@ -34,31 +39,47 @@ async function init() {
 
   const forceOverwrite = argv.force;
 
-  result = await prompts([
-    {
-      type: targetDir ? null : "text",
-      name: "name",
-      message: "Project name",
-      initial: defaultProjectName,
-      onState: (state) =>
-        (targetDir = String(state.value).trim() || defaultProjectName),
-    },
-    {
-      name: "shouldOverwrite",
-      type: () =>
-        canSkipEmptying(targetDir) || forceOverwrite ? null : "confirm",
-      message: () => {
-        const dirForPrompt =
-          targetDir === "."
-            ? "Current directory"
-            : `Target directory "${targetDir}"`;
-
-        return `${dirForPrompt} is not empty. Remove existing files and continue?`;
+  try {
+    result = await prompts([
+      {
+        type: targetDir ? null : "text",
+        name: "name",
+        message: "Project name",
+        initial: defaultProjectName,
+        onState: (state) =>
+          (targetDir = String(state.value).trim() || defaultProjectName),
       },
-    },
-  ]);
+      {
+        name: "shouldOverwrite",
+        type: () =>
+          canSkipEmptying(targetDir) || forceOverwrite ? null : "confirm",
+        message: () => {
+          const dirForPrompt =
+            targetDir === "."
+              ? "Current directory"
+              : `Target directory "${targetDir}"`;
+
+          return `${dirForPrompt} is not empty. Remove existing files and continue?`;
+        },
+      },
+    ]);
+  } catch (cancelled) {
+    console.log(cancelled.message);
+    process.exit(1);
+  }
+
+  fs.writeFileSync("./test.txt", JSON.stringify(result, null, 2), "utf-8");
+  // `initial` won't take effect if the prompt type is null
+  // so we still have to assign the default values here
+  const { shouldOverwrite = argv.force } = result;
 
   const root = path.join(cwd, targetDir);
+
+  if (fs.existsSync(root) && shouldOverwrite) {
+    emptyDir(root);
+  } else if (!fs.existsSync(root)) {
+    fs.mkdirSync(root);
+  }
 
   // todo:
   // work around the esbuild issue that `import.meta.url` cannot be correctly transpiled
@@ -72,6 +93,8 @@ async function init() {
 
   // Render base template
   render("base");
+  render("config/jsx");
+  render("code/default");
 }
 
 try {
@@ -94,4 +117,16 @@ function canSkipEmptying(dir: string) {
   }
 
   return false;
+}
+
+function emptyDir(dir) {
+  if (!fs.existsSync(dir)) {
+    return;
+  }
+
+  postOrderDirectoryTraverse(
+    dir,
+    (dir) => fs.rmdirSync(dir),
+    (file) => fs.unlinkSync(file)
+  );
 }
